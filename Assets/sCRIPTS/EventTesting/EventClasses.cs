@@ -85,15 +85,27 @@ public class  InFlagRange
     }
 
 }
-public class  MinimapUpdate
+public class MinimapUpdate
 {
     public GameObject player;
- 
+
 
     public MinimapUpdate(GameObject player)
     {
         this.player = player;
-        
+
+    }
+
+}
+public class PosCalibration
+{
+    public GameObject player;
+
+
+    public PosCalibration(GameObject player)
+    {
+        this.player = player;
+
     }
 
 }

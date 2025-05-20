@@ -51,5 +51,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "CTFPrototype.sln"
+    "dotnet.defaultSolution": "Ctfprototype2.0.sln"
 }

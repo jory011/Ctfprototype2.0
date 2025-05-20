@@ -160,6 +160,7 @@ public class ReadyManager : MonoBehaviour
             {
                 Debug.Log($"Teleporting {entry.player.name} to {entry.teleportpos} (Zone {entry.zoneID})");
                 entry.player.transform.position = entry.teleportpos;
+                EventBus.Invoke(new PosCalibration(entry.player)); 
             }
             else
             {

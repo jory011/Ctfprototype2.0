@@ -2083,7 +2083,7 @@ GameObject:
   - component: {fileID: 459860310}
   - component: {fileID: 459860309}
   - component: {fileID: 459860308}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3820,7 +3820,7 @@ GameObject:
   - component: {fileID: 843554474}
   m_Layer: 0
   m_Name: killbox
-  m_TagString: Untagged
+  m_TagString: FallOff
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3840,7 +3840,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -5499,6 +5499,24 @@ MonoBehaviour:
   detectionMask:
     serializedVersion: 2
     m_Bits: 0
+--- !u!114 &1433047064
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1433047056}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36720d74f27992d43858055c27e1e9ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  saveInterval: 5
+  retryInterval: 1
+  groundCheckDistance: 10
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!1 &1436717449
 GameObject:
   m_ObjectHideFlags: 0
@@ -7606,7 +7624,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2046592012618809895, guid: dfce919df6644024f8985767aadea228, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -645
+      value: -21.89
       objectReference: {fileID: 0}
     - target: {fileID: 2046592012618809895, guid: dfce919df6644024f8985767aadea228, type: 3}
       propertyPath: m_LocalPosition.y
@@ -7719,6 +7737,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2707895916957898235, guid: dfce919df6644024f8985767aadea228, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1433047063}
+    - targetCorrespondingSourceObject: {fileID: 2707895916957898235, guid: dfce919df6644024f8985767aadea228, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1433047064}
     - targetCorrespondingSourceObject: {fileID: 3605258702570241299, guid: dfce919df6644024f8985767aadea228, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1510806473}
