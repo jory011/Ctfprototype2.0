@@ -22,14 +22,41 @@ public class ReadyManager : MonoBehaviour
     {
         EventBus.Subscribe<ReadyEvent>(OnReadyEvent);
 
-        // Initialize player list
-        Players = FindObjectsOfType<Movement>().ToList();
     }
 
     void OnDisable()
     {
         EventBus.UnSubscribe<ReadyEvent>(OnReadyEvent);
     }
+
+    void Start()
+    {
+        PlayertagGetter();//intilization bus also error preventing using eventbus to feed scripts player.tag will give error if they are misassigned
+    }
+    private void PlayertagGetter()
+    {
+        Players = FindObjectsOfType<Movement>().ToList();
+
+        if (Players.Count == 0)
+        {
+            Debug.LogWarning("No players found.");
+            return;
+        }
+
+        string commonTag = Players[0].gameObject.tag;
+        bool allSame = Players.All(player => player.gameObject.tag == commonTag);
+
+        if (allSame)
+        {
+            EventBus.Invoke(new TagIntializeEvent(commonTag));
+
+        }
+        else
+        {
+            Debug.LogError("Not all players share the same tag. pls make sure they all share a logically named tag");
+        }
+    }
+
 
     private void OnReadyEvent(ReadyEvent evt)
     {
@@ -82,18 +109,21 @@ public class ReadyManager : MonoBehaviour
         if (stateChanged)
         {
             int readyCount = readyPlayerEntries.Count(e => e.ready);
-            EventBus.Invoke(new PlayersReadyChangedEvent(readyCount, Players.Count));
+            
         }
 
         var readyEntries = readyPlayerEntries.Where(e => e.ready && e.player != null).ToList();
 
         bool allPlayersReady = readyEntries.Count == Players.Count && readyEntries.Select(e => e.zoneID).Distinct().Count() == readyEntries.Count;
 
+        EventBus.Invoke(new PlayersReadyChangedEvent(readyEntries.Select(e => e.zoneID).Distinct().Count(), Players.Count));
 
         if (allPlayersReady)
         {
+
             if (countdownCoroutine == null)
             {
+                
                 countdownCoroutine = StartCoroutine(StartCountdown(3));
             }
         }
@@ -103,6 +133,7 @@ public class ReadyManager : MonoBehaviour
             {
                 StopCoroutine(countdownCoroutine);
                 countdownCoroutine = null;
+                EventBus.Invoke(new CountdownEvent(0)); 
                 Debug.Log("Countdown canceled: not all players ready.");
             }
         }
@@ -160,7 +191,8 @@ public class ReadyManager : MonoBehaviour
             {
                 Debug.Log($"Teleporting {entry.player.name} to {entry.teleportpos} (Zone {entry.zoneID})");
                 entry.player.transform.position = entry.teleportpos;
-                EventBus.Invoke(new PosCalibration(entry.player)); 
+                EventBus.Invoke(new CountdownEvent(0));
+                EventBus.Invoke(new PosCalibration(entry.player));
             }
             else
             {

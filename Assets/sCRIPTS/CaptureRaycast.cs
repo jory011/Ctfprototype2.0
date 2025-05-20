@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor.Callbacks;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -10,9 +11,28 @@ public class CaptureRaycast : MonoBehaviour
     [SerializeField] private PlayerInputActions inputActions;
     [SerializeField] private float shootRange = 10f;
     [SerializeField] private bool uiactive = false;
-    [SerializeField] private LayerMask detectionMask; // Optional for performance
     private Coroutine uiPingCoroutine;
+    private string PlayerTag;
+    private GameObject NullCheckValue;
+    
+    private void OnEnable()
+    {
+        EventBus.Subscribe<FlagSwap>(OnFlagGrabbed);
+        EventBus.Subscribe<TagIntializeEvent>(Tagsetter);
 
+
+    }
+
+    private void OnDisable()
+    {
+        EventBus.UnSubscribe<FlagSwap>(OnFlagGrabbed);
+        EventBus.UnSubscribe<TagIntializeEvent>(Tagsetter);
+    }
+     private void Tagsetter(TagIntializeEvent e)
+    {
+        PlayerTag = e.playertag;
+
+    }
 
     private void Awake()
     {
@@ -28,6 +48,11 @@ public class CaptureRaycast : MonoBehaviour
             inputActions.Gamepad.Disable();
         }
     }
+
+    private void OnFlagGrabbed(FlagSwap e)
+    {
+        NullCheckValue = e.newFlagHolder;
+    }
     private void OnShoot()
     {
         // Use this GameObject's transform as origin
@@ -39,15 +64,18 @@ public class CaptureRaycast : MonoBehaviour
         {
             Debug.DrawLine(origin, hit.point, Color.red, 1f);  // Optional: visualiz
 
-            if (hit.collider.CompareTag("Player"))
+            if (hit.collider.CompareTag(PlayerTag) && hit.collider.gameObject != gameObject)
             {
-                EventBus.Invoke(new FlagSwap(gameObject, hit.transform.gameObject));
+                if (NullCheckValue != null)
+                {
+                    EventBus.Invoke(new FlagSwap(gameObject, hit.transform.gameObject));
+                    Debug.Log(gameObject.name + hit.transform.gameObject + "Flagswapped to,from"); 
+                }
+
             }
+
         }
-        else
-        {
-            Debug.DrawRay(origin, direction * shootRange, Color.green, 1f);  // Optional: visualize miss
-        }
+        
     }
     private void Update()
     {
@@ -86,7 +114,7 @@ public class CaptureRaycast : MonoBehaviour
             Debug.DrawLine(origin, hit.point, Color.red, 1f);
             Debug.Log($"Raycast hit: {hit.collider.name}");
 
-            if (hit.collider.CompareTag("Player"))
+            if (hit.collider.CompareTag(PlayerTag))
             {
                 uiactive = true;
                 return;

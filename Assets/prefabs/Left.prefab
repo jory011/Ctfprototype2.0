@@ -45,7 +45,6 @@ GameObject:
   - component: {fileID: 6676174733020556964}
   - component: {fileID: 4289606198089156696}
   - component: {fileID: 8640447050817183047}
-  - component: {fileID: 5401713250953352539}
   m_Layer: 0
   m_Name: Left
   m_TagString: Player
@@ -189,34 +188,14 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
+  acceleration: 15
+  airControlMultiplier: 0.5
+  debuffMultiplier: 0
+  debuffuration: 0
   cameraTransform: {fileID: 4463272639448552121}
   invertY: 0
   rotationSpeed: 50
   pitchClamp: 30
-  shootRange: 10
-  shootDamage: 1
-  HasFlag: 0
---- !u!65 &5401713250953352539
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2707895916957898235}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 3, y: 3, z: 3}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &3605258702570241299
 GameObject:
   m_ObjectHideFlags: 0

@@ -21,19 +21,7 @@ public class FlagSwap
     {
         this.newFlagHolder = newFlagHolder;
         this.oldFlagHolder = oldFlagHolder;
-        
-    }
-}
 
-public class EnemySpawnedEvent
-{
-    public Vector3 spawnPosition;
-    public string enemyType;
-
-    public EnemySpawnedEvent(Vector3 spawnPosition, string enemyType)
-    {
-        this.spawnPosition = spawnPosition;
-        this.enemyType = enemyType;
     }
 }
 public class ReadyEvent
@@ -73,15 +61,15 @@ public class PlayersReadyChangedEvent
 
 }
 
-public class  InFlagRange
+public class InFlagRange
 {
     public GameObject player;
- 
+
 
     public InFlagRange(GameObject player)
     {
         this.player = player;
-        
+
     }
 
 }
@@ -109,4 +97,40 @@ public class PosCalibration
     }
 
 }
+public class WinEvent
+{
+    public GameObject player;
+
+
+    public WinEvent(GameObject player)
+    {
+        this.player = player;
+
+    }
+
+}
+
+public class TagIntializeEvent
+{
+
+
+    public string playertag;
+
+
+    public TagIntializeEvent(string playertag)
+    {
+        this.playertag = playertag;
+
+    }
+}
+public class BothReadyUI
+{
+    public bool BothReady;
+    public BothReadyUI(bool BothReady)
+    {
+        this.BothReady = BothReady;
+
+    }
+}
+
 

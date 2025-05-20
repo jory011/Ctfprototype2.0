@@ -42,7 +42,7 @@ public class PositionSaver : MonoBehaviour
     {
         if (e.player == gameObject)
         {
-            TrySavePositionWithCheck();
+            SavePosition();
         }
         
     }
