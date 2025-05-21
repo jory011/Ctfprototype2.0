@@ -17,6 +17,7 @@ public class UIManager : MonoBehaviour
     [Header("Player-to-Text Mapping (Index Matched cant be botherd changing core events)")]
     [SerializeField] private List<GameObject> playerObjects = new();
     [SerializeField] private List<TextMeshProUGUI> playerTextFields = new();
+    [SerializeField] private List<GameObject> crosshairs = new();
     private Dictionary<GameObject, TextMeshProUGUI> playerTextMap = new();
     [Header("ik i hsould change the events and have a player text assignment but also what if i like dont??")]
     private bool flagHasBeenPickedUp = false;
@@ -27,7 +28,8 @@ public class UIManager : MonoBehaviour
         EventBus.Subscribe<FlagSwap>(FlagSwapUI);
         EventBus.Subscribe<PlayersReadyChangedEvent>(PlayersReadyUI);
         EventBus.Subscribe<PosCalibration>(DisableCountdownUI);
-        
+        EventBus.Subscribe<InFlagRange>(InFlagRangeUI);
+
     }
     private void OnDisable()
     {
@@ -36,8 +38,47 @@ public class UIManager : MonoBehaviour
         EventBus.UnSubscribe<FlagSwap>(FlagSwapUI);
         EventBus.UnSubscribe<PlayersReadyChangedEvent>(PlayersReadyUI);
         EventBus.UnSubscribe<PosCalibration>(DisableCountdownUI);
-    
+        EventBus.UnSubscribe<InFlagRange>(InFlagRangeUI);
     }
+
+    private void InFlagRangeUI(InFlagRange e)
+    {
+        if (e.player == null)
+        {
+            Debug.LogWarning("InFlagRange event has null player.");
+            return;
+        }
+
+        int index = playerObjects.IndexOf(e.player);
+
+        if (index < 0 || index >= crosshairs.Count)
+        {
+            Debug.LogWarning($"Player {e.player.name} not found in playerObjects or index out of range.");
+            return;
+        }
+
+        GameObject crosshair = crosshairs[index];
+        var image = crosshair.GetComponent<UnityEngine.UI.RawImage>();
+
+        if (image == null)
+        {
+            Debug.LogWarning($"Crosshair at index {index} doesn't have a RawImage component.");
+            return;
+        }
+
+        image.color = Color.red;
+        Debug.Log($"Set crosshair color to red for player: {e.player.name}");
+
+        // Start coroutine to revert color
+        StartCoroutine(ResetCrosshairColorAfterDelay(image, 0.2f));
+    }
+
+    private IEnumerator ResetCrosshairColorAfterDelay(UnityEngine.UI.RawImage image, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        image.color = Color.white; // Or whatever the default color is
+    }
+
     private void DisableCountdownUI(PosCalibration e)
     {
         CountDownUIHolder.SetActive(false);
@@ -56,7 +97,7 @@ public class UIManager : MonoBehaviour
             CountDownUIHolder.transform.GetComponentInChildren<TextMeshProUGUI>().text = "Countdown " + e.secondsRemaining + ".......";
 
         }
-        
+
     }
 
     private void WinUI(WinEvent e)

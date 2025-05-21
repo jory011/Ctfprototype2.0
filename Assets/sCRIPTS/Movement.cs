@@ -11,7 +11,8 @@ public class Movement : MonoBehaviour
     [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float jumpForce = 5f;
-    [SerializeField] private float groundCheckDistance = 1.1f;
+    [SerializeField] private Transform groundCheckPoint; // Drag a transform near the feet
+[SerializeField] private float groundCheckRadius = 0.2f; // Small sphere radius
     [SerializeField] private LayerMask groundLayer;
     [Header("Advanced Movement Tuning")]
     [SerializeField] private float acceleration = 15f;
@@ -21,6 +22,8 @@ public class Movement : MonoBehaviour
 
     [Header("Look Settings")]
     [SerializeField] private Transform cameraTransform;
+    [SerializeField] private Transform cameraPivotX;
+    [SerializeField] private Transform cameraPivotY;
     [SerializeField] private bool invertY = false;
     [SerializeField] private float rotationSpeed = 100f;
     [SerializeField] private float pitchClamp = 80f;
@@ -29,6 +32,7 @@ public class Movement : MonoBehaviour
     private float cameraPitch = 0f;
     private float originalMoveSpeed;
     private Coroutine debuffCoroutine;
+    private Vector3 movingDirection = Vector3.zero;
 
     private void Awake()
     {
@@ -75,37 +79,56 @@ public class Movement : MonoBehaviour
 
         bool grounded = IsGrounded();
         float control = grounded ? 1f : airControlMultiplier;
-
-        Vector3 desiredVelocity = moveDirection * moveSpeed;
-        Vector3 currentVelocity = rb.velocity;
-        Vector3 horizontalVelocity = new Vector3(currentVelocity.x, 0f, currentVelocity.z);
-
-        Vector3 velocityChange = (desiredVelocity - horizontalVelocity) * acceleration * control;
-
-        rb.AddForce(new Vector3(velocityChange.x, 0f, velocityChange.z), ForceMode.Force);
-
-    }
-
-
-
-    private void HandleRotation()
-    {
-        Vector2 lookInput = useGamepad
-            ? inputActions.Gamepad.Look.ReadValue<Vector2>()
-            : inputActions.Keyboard.Look.ReadValue<Vector2>();
-
-        float x = lookInput.x * rotationSpeed * Time.deltaTime;
-        float y = lookInput.y * rotationSpeed * Time.deltaTime * (invertY ? 1 : -1);
-
-        transform.Rotate(Vector3.up * x);
-
-        cameraPitch += y;
-        cameraPitch = Mathf.Clamp(cameraPitch, -pitchClamp, pitchClamp);
-        if (cameraTransform != null)
+        if (moveDirection.magnitude > 1)
         {
-            cameraTransform.localEulerAngles = new Vector3(cameraPitch, 0f, 0f);
+            moveDirection.Normalize();
         }
+        Vector3 desiredVelocity = moveDirection;
+        //Vector3 currentVelocity = rb.velocity;
+        //Vector3 horizontalVelocity = new Vector3(currentVelocity.x, 0f, currentVelocity.z);
+
+        //Vector3 velocityChange = (desiredVelocity - horizontalVelocity) * acceleration * control;
+
+
+        //rb.AddForce(new Vector3(velocityChange.x, 0f, velocityChange.z), ForceMode.Force);
+        movingDirection += desiredVelocity;
+        if (desiredVelocity.magnitude > 0)
+        {
+            if (movingDirection.magnitude > moveSpeed)
+            {
+                movingDirection = movingDirection.normalized * moveSpeed;
+            }
+        }
+        else
+        {
+            movingDirection *= 0.9f;
+        }
+
+
+
+        rb.velocity = new Vector3(movingDirection.x, rb.velocity.y, movingDirection.z);
     }
+
+
+private void HandleRotation()
+{
+    Vector2 lookInput = useGamepad
+        ? inputActions.Gamepad.Look.ReadValue<Vector2>()
+        : inputActions.Keyboard.Look.ReadValue<Vector2>();
+
+    float x = lookInput.x * rotationSpeed * Time.deltaTime;
+    float y = lookInput.y * rotationSpeed * Time.deltaTime;
+
+    // Rotate yaw (left/right) on the player body
+    transform.Rotate(Vector3.up * x);
+
+    // Get current pitch (up/down)
+    cameraPitch -= y;
+    cameraPitch = Mathf.Clamp(cameraPitch, -pitchClamp, pitchClamp);
+
+    // Apply pitch to camera pivot (usually a separate child object)
+    cameraPivotX.localEulerAngles = new Vector3(cameraPitch, 0f, 0f);
+}
 
     private void Jump()
     {
@@ -114,7 +137,7 @@ public class Movement : MonoBehaviour
 
     private bool IsGrounded()
     {
-        return Physics.Raycast(transform.position, Vector3.down, groundCheckDistance, groundLayer);
+        return Physics.CheckSphere(groundCheckPoint.position, groundCheckRadius, groundLayer);
     }
 
     public void ApplySpeedDebuff()
