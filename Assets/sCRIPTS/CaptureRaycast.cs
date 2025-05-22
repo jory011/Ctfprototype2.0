@@ -11,6 +11,8 @@ public class CaptureRaycast : MonoBehaviour
     [SerializeField] private PlayerInputActions inputActions;
     [SerializeField] private float shootRange = 10f;
     [SerializeField] private bool uiactive = false;
+    [SerializeField] private Transform camtransform;
+    private bool previousUIActive = false;
     private Coroutine uiPingCoroutine;
     private string PlayerTag;
     private GameObject NullCheckValue;
@@ -56,8 +58,8 @@ public class CaptureRaycast : MonoBehaviour
     private void OnShoot()
     {
         // Use this GameObject's transform as origin
-        Vector3 origin = transform.position;
-        Vector3 direction = transform.forward;
+        Vector3 origin = camtransform.position;
+        Vector3 direction = camtransform.forward;
 
         // Perform the raycast
         if (Physics.Raycast(origin, direction, out RaycastHit hit, shootRange))
@@ -78,31 +80,37 @@ public class CaptureRaycast : MonoBehaviour
         
     }
     private void Update()
-    {
-        UpdateUIRaycastCheck();
+{
+    UpdateUIRaycastCheck();
 
-        bool jumpPressed = useGamepad
-               ? inputActions.Gamepad.Shoot.triggered
-               : inputActions.Keyboard.Shoot.triggered;
-        if (jumpPressed)
+    bool jumpPressed = useGamepad
+           ? inputActions.Gamepad.Shoot.triggered
+           : inputActions.Keyboard.Shoot.triggered;
+    if (jumpPressed)
+    {
+        OnShoot();
+    }
+
+    // Start coroutine if uiactive became true this frame
+    if (uiactive && !previousUIActive)
+    {
+        if (uiPingCoroutine != null) StopCoroutine(uiPingCoroutine);
+        uiPingCoroutine = StartCoroutine(UIPingRoutine());
+    }
+    // Stop coroutine if uiactive became false this frame
+    else if (!uiactive && previousUIActive)
+    {
+        if (uiPingCoroutine != null)
         {
-            OnShoot();
-        }
-        bool previousUIActive = uiactive;
-        if (uiactive && !previousUIActive)
-        {
-            if (uiPingCoroutine != null) StopCoroutine(uiPingCoroutine);
-            uiPingCoroutine = StartCoroutine(UIPingRoutine());
-        }
-        else if (!uiactive && previousUIActive)
-        {
-            if (uiPingCoroutine != null)
-            {
-                StopCoroutine(uiPingCoroutine);
-                uiPingCoroutine = null;
-            }
+            StopCoroutine(uiPingCoroutine);
+            uiPingCoroutine = null;
         }
     }
+
+    // Store current state for next frame comparison
+    previousUIActive = uiactive;
+}
+
     private void UpdateUIRaycastCheck()
     {
 
