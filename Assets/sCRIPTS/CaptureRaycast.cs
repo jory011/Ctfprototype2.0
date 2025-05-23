@@ -11,6 +11,7 @@ public class CaptureRaycast : MonoBehaviour
     [SerializeField] private PlayerInputActions inputActions;
     [SerializeField] private float shootRange = 10f;
     [SerializeField] private bool uiactive = false;
+    [SerializeField] private Transform camtransform;
     private bool previousUIActive = false;
     private Coroutine uiPingCoroutine;
     private string PlayerTag;
@@ -57,8 +58,8 @@ public class CaptureRaycast : MonoBehaviour
     private void OnShoot()
     {
         // Use this GameObject's transform as origin
-        Vector3 origin = transform.position;
-        Vector3 direction = transform.forward;
+        Vector3 origin = camtransform.position;
+        Vector3 direction = camtransform.forward;
 
         // Perform the raycast
         if (Physics.Raycast(origin, direction, out RaycastHit hit, shootRange))
