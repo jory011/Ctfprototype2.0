@@ -39,14 +39,14 @@ public class MinimapRotating : MonoBehaviour
         // Optional: rotate player icon to face same direction as player
         if (iconPlayer != null)
         {
-            float playerYRotation = player.eulerAngles.y - minimapCamera.transform.eulerAngles.y;
+            float playerYRotation = player.eulerAngles.y - minimapCamera.transform.eulerAngles.y - 90f;
             iconPlayer.localRotation = Quaternion.Euler(0f, 0f, -playerYRotation);
         }
 
         // Rotate opponent icon based on their rotation relative to player and minimap camera
         if (iconOpponent != null && opponent != null)
         {
-            float relativeRotation = opponent.eulerAngles.y - minimapCamera.transform.eulerAngles.y;
+            float relativeRotation = opponent.eulerAngles.y - minimapCamera.transform.eulerAngles.y - 90f;
             iconOpponent.localRotation = Quaternion.Euler(0f, 0f, -relativeRotation);
         }
 
