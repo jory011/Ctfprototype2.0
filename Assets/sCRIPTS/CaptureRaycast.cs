@@ -43,19 +43,31 @@ public class CaptureRaycast : MonoBehaviour
         {
             inputActions.Gamepad.Enable();
             inputActions.Keyboard.Disable();
+            inputActions.Keyboard.Shoot.performed += OnShoot;
         }
         else
         {
             inputActions.Keyboard.Enable();
             inputActions.Gamepad.Disable();
+            inputActions.Keyboard.Shoot.performed += OnShoot;
         }
     }
+    private void OnDestroy()
+{
+    if (inputActions != null)
+    {
+        inputActions.Gamepad.Shoot.performed -= OnShoot;
+        inputActions.Keyboard.Shoot.performed -= OnShoot;
+    }
+}
+
+
 
     private void OnFlagGrabbed(FlagSwap e)
     {
         NullCheckValue = e.newFlagHolder;
     }
-    private void OnShoot()
+    private void OnShoot(InputAction.CallbackContext context)
     {
         // Use this GameObject's transform as origin
         Vector3 origin = camtransform.position;
@@ -82,14 +94,6 @@ public class CaptureRaycast : MonoBehaviour
     private void Update()
 {
     UpdateUIRaycastCheck();
-
-    bool jumpPressed = useGamepad
-           ? inputActions.Gamepad.Shoot.triggered
-           : inputActions.Keyboard.Shoot.triggered;
-    if (jumpPressed)
-    {
-        OnShoot();
-    }
 
     // Start coroutine if uiactive became true this frame
     if (uiactive && !previousUIActive)
